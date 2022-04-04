@@ -19,26 +19,106 @@ else:
 
 from sklearn.utils.validation import check_is_fitted
 
-class RFProximity(RandomForestClassifier):
+
+def MakeRF(label_type = 'categorical', prox_method = 'oob', matrix_type = 'sparse', **kwargs):
+
+    """A method to generate an instance of the class RFProximity, 
+       determining whether the data labels are categorical or numeric
+
+    Parameters
+    ----------
+    label_type : str
+        The type of forest to be created, supported types are 'categorical' for a 
+        classification forest, or 'numeric' for a regression forest
+
+    prox_method : str
+        The type of proximity to be constructed.  Options are 'original', 'oob', 
+        or 'rfgap' (default is 'oob')
+
+    matrix_type : str
+        Whether the matrix returned proximities whould be sparse or dense 
+        (default is sparse)
+
+    **kwargs
+        Keyward arguements specific to the RandomForestClassifer or 
+        RandomForestRegressor classes
 
     """
-    This class takes on a random forest predictors (sklearn) and addes methods to 
-    construct proximities from the random forest object. 
 
-    Note: most methods here will not work until your forest is fit.  That is, use 
-    RFProximity.fit(X, y) prior to generating proximities.
+
+    if label_type == 'categorical':
+        return RFProximity(prox_method, matrix_type, **kwargs)
+
+    elif label_type == 'numeric':
+        return RFProximityReg(prox_method, matrix_type, **kwargs)
+
+    else: 
+        print('Only "categorical" or "numeric" types are supported.')
+
+
+class RFProximity(RandomForestClassifier):
+
+    """This class takes on a random forest predictors (sklearn) and adds methods to 
+       construct proximities from the random forest object. 
+
+    # TODO: Make available with both Classifier and Regressor, conditionally
     """
 
     def __init__(self, prox_method = 'oob', matrix_type = 'sparse', **kwargs):
+        """
+        
+        Parameters
+        ----------
+        prox_method : str
+            The type of proximity to be constructed.  Options are 'original', 'oob', 
+            or 'rfgap' (default is 'oob')
+
+        matrix_type : str
+            Whether the matrix returned proximities whould be sparse or dense 
+            (default is sparse)
+
+        **kwargs
+            Keyward arguements specific to the RandomForestClassifer or 
+            RandomForestRegressor classes
+
+        Returns
+        -------
+        self : object
+            The RF object (unfitted)
+
+        """
         super(RFProximity, self).__init__(**kwargs)
 
         self.prox_method = prox_method
         self.matrix_type = matrix_type
-        #TODO: get args and such from below for 'paperwork'
 
 
-    #TODO: Make sure this is still working after defining this method
     def fit(self, X, y, sample_weight = None):
+
+        """Fits the random forest and generates necessary pieces to fit proximities
+
+        Parameters
+        ----------
+
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            The training input samples. Internally, its dtype will be converted to dtype=np.float32.
+            If a sparse matrix is provided, it will be converted into a sparse csc_matrix.
+
+        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            The target values (class labels in classification, real numbers in regression).
+
+        sample_weight : array-like of shape (n_samples,), default=None
+            Sample weights. If None, then samples are equally weighted. Splits that would 
+            create child nodes with net zero or negative weight are ignored while searching 
+            for a split in each node. In the case of classification, splits are also ignored 
+            if they would result in any single class carrying a negative weight in either child node.
+
+        Returns
+        -------
+        self : object
+            Fitted estimator.
+
+        """
         super().fit(X, y, sample_weight)
         self.leaf_matrix = self.apply(X)
         self.oob_indices = self.get_oob_indices(X)
@@ -46,12 +126,11 @@ class RFProximity(RandomForestClassifier):
     
     def _get_oob_samples(self, data):
         
-      """
-      This is a helper function for get_oob_indices. 
+      """This is a helper function for get_oob_indices. 
       
       Parameters
       ----------
-      data : (n, d) array_like (numeric)
+      data : array_like (numeric) of shape (n_samples, n_features)
       
       """
       n = len(data)
@@ -66,19 +145,16 @@ class RFProximity(RandomForestClassifier):
 
     def get_oob_indices(self, data): #The data here is your X_train matrix
         
-      """
-      This generates a matrix of out-of-bag samples for each decision tree in the forest
-      
+      """This generates a matrix of out-of-bag samples for each decision tree in the forest
       
       Parameters
       ----------
-      data : (n, d) array_like (numeric)
+      data : array_like (numeric) of shape (n_samples, n_features)
       
       
       Returns
       -------
-      oob_matrix : (n, n_estimators) array_like
-      
+      oob_matrix : array_like (n_samples, n_estimators) 
       
       """
       n = len(data)
@@ -92,19 +168,18 @@ class RFProximity(RandomForestClassifier):
       return oob_matrix
     
     def get_proximity_vector(self, ind, leaf_matrix, oob_indices):
-        """
-        This method produces a vector of proximity values for a given observation index. This is typically
-        used in conjunction with get_proximities.
+        """This method produces a vector of proximity values for a given observation
+           index. This is typically used in conjunction with get_proximities.
         
         Parameters
         ----------
-        leaf_matrix : (n, n_estimators) array_like
-        oob_indices : (n, n_estimators) array_like
-        method      : string: methods may be 'original' or 'oob' (default)
+        leaf_matrix : (n_samples, n_estimators) array_like
+        oob_indices : (n_samples, n_estimators) array_like
+        method      : string: methods may be 'original', 'oob', or 'rfgap (default is 'oob')
         
         Returns
-        ------
-        prox_vec : (n, 1) array)_like: a vector of proximity values
+        -------
+        prox_vec : (n_samples, 1) array)_like: a vector of proximity values
         """
         n, num_trees = leaf_matrix.shape
         prox_vec = np.zeros((1, n))
@@ -171,22 +246,20 @@ class RFProximity(RandomForestClassifier):
     
     def get_proximities(self, data):
         
-        """
-        This method produces a proximity matrix for the random forest object.
+        """This method produces a proximity matrix for the random forest object.
         
         
         Parameters
         ----------
-        data : (n, d) array_like (numeric)
-        method : string: methods may be 'original' or 'oob' (default)
-        matrix_type: string: 'dense' (default) to return a dense matrix, 'sparse' to return a sparse crs matrix
-        verbose : bool: should progress be printed to console (default: False)
-        
+        data : (n_samples, n_features) array_like (numeric)
         
         Returns
         -------
-        prox (if matrix_type = dense) : a matrix of random forest proximities
-        prox_sparse (if matrix_type = sparse) : a sparse crs_matrix of proximities
+        array-like
+            (if self.matrix_type == 'dense') matrix of pair-wise proximities
+
+        csr_matrix
+            (if self.matrix_type == 'sparse') a sparse crs_matrix of pair-wise proximities
         
         """
         check_is_fitted(self)
@@ -215,14 +288,29 @@ class RFProximity(RandomForestClassifier):
         else:
             return prox_sparse
 
-    def prox_extend(self, extended_data):
-        """
-        Method to compute proximities between the original training observations and a set of new observations
+
+    def prox_extend(self, data):
+        """Method to compute proximities between the original training 
+           observations and a set of new observations.
+
+        Parameters
+        ----------
+        data : (n_samples, n_features) array_like (numeric)
+        
+        Returns
+        -------
+        array-like
+            (if self.matrix_type == 'dense') matrix of pair-wise proximities between
+            the training data and the new observations
+
+        csr_matrix
+            (if self.matrix_type == 'sparse') a sparse crs_matrix of pair-wise proximities
+            between the training data and the new observations
         """
         check_is_fitted(self)
         n, num_trees = self.leaf_matrix.shape
 
-        extended_leaf_matrix = self.apply(extended_data)
+        extended_leaf_matrix = self.apply(data)
         n_ext, _ = extended_leaf_matrix.shape
 
 
@@ -321,27 +409,69 @@ class RFProximity(RandomForestClassifier):
             return prox_sparse
 
 
-
 class RFProximityReg(RandomForestRegressor):
 
-    """
-    This class takes on a random forest predictors (sklearn) and addes methods to 
-    construct proximities from the random forest object. 
+    """This class takes on a random forest predictors (sklearn) and adds methods to 
+       construct proximities from the random forest object. 
 
-    Note: most methods here will not work until your forest is fit.  That is, use 
-    RFProximity.fit(X, y) prior to generating proximities.
+    # TODO: Make available with both Classifier and Regressor, conditionally
     """
 
     def __init__(self, prox_method = 'oob', matrix_type = 'sparse', **kwargs):
-        super(RFProximity, self).__init__(**kwargs)
+        """
+        
+        Parameters
+        ----------
+        prox_method : str
+            The type of proximity to be constructed.  Options are 'original', 'oob', 
+            or 'rfgap' (default is 'oob')
+
+        matrix_type : str
+            Whether the matrix returned proximities whould be sparse or dense 
+            (default is sparse)
+
+        **kwargs
+            Keyward arguements specific to the RandomForestClassifer or 
+            RandomForestRegressor classes
+
+        Returns
+        -------
+        self : object
+            The RF object (unfitted)
+
+        """
+        super(RFProximityReg, self).__init__(**kwargs)
 
         self.prox_method = prox_method
         self.matrix_type = matrix_type
-        #TODO: get args and such from below for 'paperwork'
 
 
-    #TODO: Make sure this is still working after defining this method
     def fit(self, X, y, sample_weight = None):
+
+        """Fits the random forest and generates necessary pieces to fit proximities
+
+        Parameters
+        ----------
+
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            The training input samples. Internally, its dtype will be converted to dtype=np.float32.
+            If a sparse matrix is provided, it will be converted into a sparse csc_matrix.
+
+        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+            The target values (class labels in classification, real numbers in regression).
+
+        sample_weight : array-like of shape (n_samples,), default=None
+            Sample weights. If None, then samples are equally weighted. Splits that would 
+            create child nodes with net zero or negative weight are ignored while searching 
+            for a split in each node. In the case of classification, splits are also ignored 
+            if they would result in any single class carrying a negative weight in either child node.
+
+        Returns
+        -------
+        self : object
+            Fitted estimator.
+
+        """
         super().fit(X, y, sample_weight)
         self.leaf_matrix = self.apply(X)
         self.oob_indices = self.get_oob_indices(X)
@@ -349,12 +479,11 @@ class RFProximityReg(RandomForestRegressor):
     
     def _get_oob_samples(self, data):
         
-      """
-      This is a helper function for get_oob_indices. 
+      """This is a helper function for get_oob_indices. 
       
       Parameters
       ----------
-      data : (n, d) array_like (numeric)
+      data : array_like (numeric) of shape (n_samples, n_features)
       
       """
       n = len(data)
@@ -369,19 +498,16 @@ class RFProximityReg(RandomForestRegressor):
 
     def get_oob_indices(self, data): #The data here is your X_train matrix
         
-      """
-      This generates a matrix of out-of-bag samples for each decision tree in the forest
-      
+      """This generates a matrix of out-of-bag samples for each decision tree in the forest
       
       Parameters
       ----------
-      data : (n, d) array_like (numeric)
+      data : array_like (numeric) of shape (n_samples, n_features)
       
       
       Returns
       -------
-      oob_matrix : (n, n_estimators) array_like
-      
+      oob_matrix : array_like (n_samples, n_estimators) 
       
       """
       n = len(data)
@@ -395,19 +521,18 @@ class RFProximityReg(RandomForestRegressor):
       return oob_matrix
     
     def get_proximity_vector(self, ind, leaf_matrix, oob_indices):
-        """
-        This method produces a vector of proximity values for a given observation index. This is typically
-        used in conjunction with get_proximities.
+        """This method produces a vector of proximity values for a given observation
+           index. This is typically used in conjunction with get_proximities.
         
         Parameters
         ----------
-        leaf_matrix : (n, n_estimators) array_like
-        oob_indices : (n, n_estimators) array_like
-        method      : string: methods may be 'original' or 'oob' (default)
+        leaf_matrix : (n_samples, n_estimators) array_like
+        oob_indices : (n_samples, n_estimators) array_like
+        method      : string: methods may be 'original', 'oob', or 'rfgap (default is 'oob')
         
         Returns
-        ------
-        prox_vec : (n, 1) array)_like: a vector of proximity values
+        -------
+        prox_vec : (n_samples, 1) array)_like: a vector of proximity values
         """
         n, num_trees = leaf_matrix.shape
         prox_vec = np.zeros((1, n))
@@ -474,22 +599,20 @@ class RFProximityReg(RandomForestRegressor):
     
     def get_proximities(self, data):
         
-        """
-        This method produces a proximity matrix for the random forest object.
+        """This method produces a proximity matrix for the random forest object.
         
         
         Parameters
         ----------
-        data : (n, d) array_like (numeric)
-        method : string: methods may be 'original' or 'oob' (default)
-        matrix_type: string: 'dense' (default) to return a dense matrix, 'sparse' to return a sparse crs matrix
-        verbose : bool: should progress be printed to console (default: False)
-        
+        data : (n_samples, n_features) array_like (numeric)
         
         Returns
         -------
-        prox (if matrix_type = dense) : a matrix of random forest proximities
-        prox_sparse (if matrix_type = sparse) : a sparse crs_matrix of proximities
+        array-like
+            (if self.matrix_type == 'dense') matrix of pair-wise proximities
+
+        csr_matrix
+            (if self.matrix_type == 'sparse') a sparse crs_matrix of pair-wise proximities
         
         """
         check_is_fitted(self)
@@ -518,14 +641,29 @@ class RFProximityReg(RandomForestRegressor):
         else:
             return prox_sparse
 
-    def prox_extend(self, extended_data):
-        """
-        Method to compute proximities between the original training observations and a set of new observations
+
+    def prox_extend(self, data):
+        """Method to compute proximities between the original training 
+           observations and a set of new observations.
+
+        Parameters
+        ----------
+        data : (n_samples, n_features) array_like (numeric)
+        
+        Returns
+        -------
+        array-like
+            (if self.matrix_type == 'dense') matrix of pair-wise proximities between
+            the training data and the new observations
+
+        csr_matrix
+            (if self.matrix_type == 'sparse') a sparse crs_matrix of pair-wise proximities
+            between the training data and the new observations
         """
         check_is_fitted(self)
         n, num_trees = self.leaf_matrix.shape
 
-        extended_leaf_matrix = self.apply(extended_data)
+        extended_leaf_matrix = self.apply(data)
         n_ext, _ = extended_leaf_matrix.shape
 
 
