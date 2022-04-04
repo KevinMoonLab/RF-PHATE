@@ -11,12 +11,6 @@ Rerun this command to check for and install  updates .
 pip install git+https://github.com/jakerhodes/rfphate
 ```
 
-## Usage
-Features:
-* functions.listChunker  --> generator that chunks and interable in evenly sized chunks 
-* functions.weirdCase    --> converts a string to a totally unreadable format
-* functions.report      --> prints to the console with a timestamp
-* decorators.singleton  --> used for decoratint your class to make it a singleton
 
 #### Demo of some of the features:
 ```python
@@ -29,7 +23,7 @@ import seaborn as sns
 data   = pd.read_csv('../data/auto-mpg.csv', sep = ',')
 x, y   = dataset.normalize_data(data, label_col = 0)
 
-rfphate_op = MakeRFPHATE(label_type = 'numeric)
+rfphate_op = MakeRFPHATE(label_type = 'numeric', random_state = 0)
 embedding = rfphate_op.fit_transform(x, y)
 
 sns.scatterplot(x = emb[:, 0], y = emb[:, 1], hue = data.iloc[:, 0])
