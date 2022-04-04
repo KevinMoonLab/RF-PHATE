@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name='RUN-RF-PHATE',
+    name='rfphate',
     version='0.0.1',
     author='Jake Rhodes',
     author_email='jake.rhodes@usu.edu',
@@ -16,6 +16,6 @@ setuptools.setup(
         "Bug Tracker": "https://github.com/jakerhodes/RUN-RF-PHATE/issues"
     },
     license='GNU-3',
-    packages=[],
+    packages=['rfphate'],
     install_requires=['sklearn', 'phate'],
 )
