@@ -1,4 +1,4 @@
-from proximity import RFProximity, RFProximityReg
+from .proximity import RFProximity, RFProximityReg
 
 # For PHATE part
 from phate import PHATE
