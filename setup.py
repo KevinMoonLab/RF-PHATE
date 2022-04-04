@@ -17,5 +17,5 @@ setuptools.setup(
     },
     license='GNU-3',
     packages=['rfphate'],
-    install_requires=['sklearn', 'phate'],
+    install_requires=['sklearn', 'phate', 'pandas'],
 )
