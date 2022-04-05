@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name='rfphate',
+    name='RF-PHATE',
     version='0.0.1',
     author='Jake Rhodes',
     author_email='jake.rhodes@usu.edu',
