@@ -33,7 +33,7 @@ sns.scatterplot(x = emb[:, 0], y = emb[:, 1], hue = data.iloc[:, 2],
 # If you want to produce the proximities:
 prox = rfphate_op.get_proximities(x)
 ```
-![]()
+![](images/titanic-sex.png)
 
 
 #### Demo of RFPHATEReg:
