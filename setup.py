@@ -17,10 +17,5 @@ setuptools.setup(
     },
     license='GNU-3',
     packages=['rfphate'],
-<<<<<<< HEAD
     install_requires=['sklearn', 'phate', 'pandas', 'seaborn'],
 )
-=======
-    install_requires=['sklearn', 'phate', 'pandas', 'seaborn'],
-)
->>>>>>> a0a9276fa2b045b5613149eeacd61c49fdcb3022
