@@ -8,7 +8,7 @@ manifold learning algorithm described in
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install RF-PHATE.
 Rerun this command to check for and install  updates .
 ```bash
-pip install git+https://github.com/jakerhodes/rfphate
+pip install git+https://github.com/KevinMoonLab/RF-PHATE
 ```
 
 The two main classes are RFPHATE and RFPHATEReg (The latter for continuous response variables (Reg for Regression)).
