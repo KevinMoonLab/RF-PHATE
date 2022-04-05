@@ -1,4 +1,4 @@
 import rfphate
-import rfphate.dataset
-import rfphate.rfphate
-import rfphate.proximity
+from . import dataset
+from . import rfphate
+from . import proximity
