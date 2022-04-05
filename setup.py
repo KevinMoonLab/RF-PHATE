@@ -11,9 +11,9 @@ setuptools.setup(
     description='Testing installation of Package',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url='https://github.com/jakerhodes/rfphate',
+    url='https://github.com/KevinMoonLab/RF-PHATE',
     project_urls = {
-        "Bug Tracker": "https://github.com/jakerhodes/rfphate/issues"
+        "Bug Tracker": "https://github.com/KevinMoonLab/RF-PHATE/issues"
     },
     license='GNU-3',
     packages=['rfphate'],
