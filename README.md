@@ -31,6 +31,11 @@ sns.scatterplot(x = emb[:, 0], y = emb[:, 1], hue = data.iloc[:, 0])
 ```
 ![](images/auto-mpg.png)
 
+For any use of the code, please cite:
+
+J.S. Rhodes, A. Cutler, G. Wolf, K.R. Moon, "Random Forest-based Diffusion Information Geometry for Supervised Visualization and Data Exploration," IEEE Statistical Signal Processing Workshop (SSP), July 2021.
+
+Arxiv version available here: https://arxiv.org/abs/2006.08701
 
 ## License
 [GNU-3](https://www.gnu.org/licenses/gpl-3.0.en.html)
