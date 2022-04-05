@@ -38,7 +38,7 @@ prox = rfphate_op.get_proximities(x)
 
 #### Demo of RFPHATEReg:
 ```python
-from rfphate import dataset, rfphate, proximity
+from rfphate import dataset, rfphate
 import pandas as pd
 import seaborn as sns
 
