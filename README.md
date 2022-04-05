@@ -11,7 +11,7 @@ Rerun this command to check for and install  updates .
 pip install git+https://github.com/jakerhodes/rfphate
 ```
 
-## The two main classes are RFPHATE and RFPHATEReg (The latter for continuous response variables (Reg for Regression)).
+The two main classes are RFPHATE and RFPHATEReg (The latter for continuous response variables (Reg for Regression)).
 ### Here we use the same sklearn fit_transform style. See a demo below.
 
 
