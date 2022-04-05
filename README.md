@@ -30,7 +30,7 @@ emb = rfphate_op.fit_transform(x, y)
 
 sns.scatterplot(x = emb[:, 0], y = emb[:, 1], hue = data.iloc[:, 0])
 ```
-![images/auto-mpg.png]
+![](images/auto-mpg.png)
 
 
 ## License
