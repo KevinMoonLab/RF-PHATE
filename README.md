@@ -14,7 +14,29 @@ pip install git+https://github.com/jakerhodes/rfphate
 The two main classes are RFPHATE and RFPHATEReg (The latter for continuous response variables (Reg for Regression)).
 Here we use the same sklearn fit_transform style. See a demo below.
 
-#### Demo of use of RFPHATEReg:
+### Demo of RFPHATE:
+```python
+from rfphate import dataset, rfphate
+import pandas as pd
+import seaborn as sns
+
+# Read in the data
+data   = pd.read_csv('data/titanic.csv', sep = ',')
+x, y   = dataset.normalize_data(data, label_col = 0)
+
+rfphate_op = rfphate.RFPHATE(random_state = 0)
+emb = rfphate_op.fit_transform(x, y)
+
+sns.scatterplot(x = emb[:, 0], y = emb[:, 1], hue = data.iloc[:, 2],
+    style = data.iloc[:, 0], style_order = [1, 0])
+
+# If you want to produce the proximities:
+prox = rfphate_op.get_proximities(x)
+```
+![]()
+
+
+#### Demo of RFPHATEReg:
 ```python
 from rfphate import dataset, rfphate, proximity
 import pandas as pd
