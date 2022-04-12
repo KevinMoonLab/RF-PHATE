@@ -379,7 +379,7 @@ class RFProximity(RandomForestClassifier):
             
             for ind in range(n_ext):
 
-                prox_vec = np.zeros((1, n))
+                prox_vec = np.zeros((1, n_ext))
 
                 for t in range(num_trees): 
 
