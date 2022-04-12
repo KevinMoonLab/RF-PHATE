@@ -379,7 +379,7 @@ class RFProximity(RandomForestClassifier):
             
             for ind in range(n_ext):
 
-                prox_vec = np.zeros((1, n_ext))
+                prox_vec = np.zeros((1, n))
 
                 for t in range(num_trees): 
 
@@ -390,7 +390,6 @@ class RFProximity(RandomForestClassifier):
                         prox_vec[0, matches] += 1 / k
                     
                 prox_vec /= num_trees
-                prox_vec[0, ind] = 0 
 
                 row_inds = np.nonzero(prox_vec)[1]
                 col_inds = np.ones(len(row_inds), dtype = int) * ind
@@ -732,18 +731,19 @@ class RFProximityReg(RandomForestRegressor):
             
             for ind in range(n_ext):
 
+                # prox_vec = np.zeros((1, n_ext))
                 prox_vec = np.zeros((1, n))
 
                 for t in range(num_trees): 
 
                     index = extended_leaf_matrix[ind, t] 
                     matches = in_bag_leaves[:, t] == index 
+                    # matches = leaf_matrix
                     k = np.count_nonzero(matches)
                     if k > 0:
                         prox_vec[0, matches] += 1 / k
                     
                 prox_vec /= num_trees
-                prox_vec[0, ind] = 0 
 
                 row_inds = np.nonzero(prox_vec)[1]
                 col_inds = np.ones(len(row_inds), dtype = int) * ind
