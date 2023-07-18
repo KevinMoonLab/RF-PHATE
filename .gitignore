@@ -129,5 +129,10 @@ dmypy.json
 .pyre/
 
 # Data files
-# data/
+data/
 test/
+images/
+rfphate/
+LICENSE
+setup.py
+README_old.md
